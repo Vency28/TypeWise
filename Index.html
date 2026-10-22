@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TypeWise – Typing Practice</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f5f6fb;--card:#fff;--text:#1c2033;--muted:#6a7089;--line:#e2e5f0;--pro:#3b5bdb;--kid:#f76707;--good:#2f9e44;--bad:#e03131;--soft:#eef1ff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#12141f;--card:#1c2031;--text:#eceefb;--muted:#9aa0bb;--line:#2e3350;--pro:#748ffc;--kid:#ffa94d;--good:#69db7c;--bad:#ff8787;--soft:#252a42}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#12141f;--card:#1c2031;--text:#eceefb;--muted:#9aa0bb;--line:#2e3350;--pro:#748ffc;--kid:#ffa94d;--good:#69db7c;--bad:#ff8787;--soft:#252a42}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+.wrap{max-width:900px;margin:0 auto;padding:20px 16px 40px}
+h1,h2,h3{margin:0 0 8px}
+.center{text-align:center}
+.muted{color:var(--muted)}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px}
+.choice{cursor:pointer;text-align:center;transition:transform .15s;border-width:2px}
+.choice:hover{transform:translateY(-4px)}
+.choice .big{font-size:56px}
+.choice.pro:hover{border-color:var(--pro)}.choice.kid:hover{border-color:var(--kid)}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:10px 18px;background:var(--pro);color:#fff;font-weight:600}
+button.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+button.kid{background:var(--kid);color:#fff}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.stat{background:var(--soft);border-radius:12px;padding:8px 14px;min-width:90px;text-align:center}
+.stat b{display:block;font-size:22px}.stat span{font-size:12px;color:var(--muted)}
+.para{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:20px;line-height:1.9;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;white-space:pre-wrap;word-break:break-word;margin-bottom:12px}
+.para span.ok{color:var(--good)}.para span.err{color:var(--bad);background:color-mix(in srgb,var(--bad) 20%,transparent);border-radius:3px}
+.para span.cur{background:color-mix(in srgb,var(--pro) 30%,transparent);border-radius:3px}
+textarea,input[type=text]{width:100%;font:inherit;font-size:18px;padding:12px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--text)}
+textarea{height:90px;resize:none}
+textarea:focus,input[type=text]:focus{outline:none;border-color:var(--pro)}
+.bar{height:8px;background:var(--line);border-radius:8px;overflow:hidden;margin-bottom:12px}
+.bar i{display:block;height:100%;width:100%;background:var(--pro);transition:width .25s linear}
+.mode h3{display:flex;justify-content:space-between}
+.tag{font-size:12px;padding:2px 10px;border-radius:99px;background:var(--soft);color:var(--pro)}
+.mode ul{list-style:none;padding:0;margin:10px 0 16px;color:var(--muted)}
+.kids{--pro:var(--kid);--soft:color-mix(in srgb,var(--kid) 14%,var(--card))}
+.arena{position:relative;height:min(52vh,380px);background:linear-gradient(#bfe3ff,#e9f7ff);border-radius:18px;overflow:hidden;border:2px solid var(--line);margin-bottom:12px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .arena{background:linear-gradient(#1b2b4d,#26385f)}}
+.fw{position:absolute;transform:translateX(-50%);background:#fff;color:#1c2033;padding:4px 12px;border-radius:99px;font-weight:700;font-size:20px;box-shadow:0 2px 6px #0003;transition:background .1s}
+.fw.hit{background:#ffd43b}
+.balloon{position:absolute;width:56px;height:68px;border-radius:50% 50% 48% 48%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:26px;color:#fff;transform:translateX(-50%);box-shadow:inset -6px -6px 0 #0002}
+.pop{animation:pop .2s forwards}@keyframes pop{to{transform:translateX(-50%) scale(1.6);opacity:0}}
+.scr{font-size:clamp(36px,10vw,64px);letter-spacing:.2em;font-weight:800;text-align:center;margin:8px 0}
+.emoji{font-size:72px;text-align:center}
+.over{position:fixed;inset:0;background:#000a;display:flex;align-items:center;justify-content:center;padding:20px;z-index:20}
+.over .card{max-width:380px;width:100%;text-align:center}
+.over .card .row{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+.lane{position:relative;height:64px;background:var(--soft);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.car{position:absolute;top:8px;left:0;font-size:40px;transition:left .15s linear}
+.flag{position:absolute;right:6px;top:12px;font-size:32px}
+.train{font-size:34px;white-space:nowrap;overflow-x:auto;margin-bottom:8px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HOME -->
+<section class="screen" id="home">
+  <div class="center" style="margin:20px 0 28px"><h1 style="font-size:clamp(30px,7vw,44px)">⌨️ TypeWise</h1><p class="muted">Who’s practicing today? Pick your path.</p></div>
+  <div class="grid">
+    <div class="card choice pro" onclick="show('pro-menu')"><div class="big">💼</div><h2>Professional</h2><p class="muted">Timed paragraph tests in three difficulty levels. Track speed and accuracy.</p><button>Start</button></div>
+    <div class="card choice kid" onclick="show('kid-menu')"><div class="big">🧒</div><h2>Kids</h2><p class="muted">Fun word games that build typing skills — no stress!</p><button class="kid">Let’s play</button></div>
+  </div>
+</section>
+
+<!-- PRO MENU -->
+<section class="screen" id="pro-menu" hidden>
+  <div class="top"><button class="ghost" onclick="show('home')">← Back</button><h2>Choose your level</h2><span></span></div>
+  <div class="grid">
+    <div class="card mode"><h3>🌱 Rookie <span class="tag">Easy</span></h3><ul><li>⏱ 2 minutes</li><li>📝 30 words</li><li>✍️ Short, simple sentences</li></ul><button onclick="startPro('rookie')">Start Rookie</button></div>
+    <div class="card mode"><h3>🚀 Intermediate <span class="tag">Medium</span></h3><ul><li>⏱ 2 minutes</li><li>📝 70 words</li><li>✍️ Past, future &amp; questions</li></ul><button onclick="startPro('inter')">Start Intermediate</button></div>
+    <div class="card mode"><h3>🔥 Expert <span class="tag">Hard</span></h3><ul><li>⏱ 2 minutes</li><li>📝 100 words</li><li>✍️ Complex grammar &amp; punctuation</li></ul><button onclick="startPro('expert')">Start Expert</button></div>
+  </div>
+</section>
+
+<!-- PRO PLAY -->
+<section class="screen" id="pro-play" hidden>
+  <div class="top"><button class="ghost" onclick="show('pro-menu')">← Quit</button><h3 id="pmode"></h3><span class="muted">Timer starts when you type</span></div>
+  <div class="bar"><i id="pbar"></i></div>
+  <div class="stats">
+    <div class="stat"><b id="ptime">0</b><span>seconds left</span></div>
+    <div class="stat"><b id="pwpm">0</b><span>WPM</span></div>
+    <div class="stat"><b id="pacc">100%</b><span>accuracy</span></div>
+    <div class="stat"><b id="pprog">0</b><span>progress</span></div>
+  </div>
+  <div class="para" id="para"></div>
+  <textarea id="pin" placeholder="Start typing here…" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+</section>
+
+<!-- KID MENU -->
+<section class="screen kids" id="kid-menu" hidden>
+  <div class="top"><button class="ghost" onclick="show('home')">← Back</button><h2>Pick a game</h2><span></span></div>
+  <div class="grid">
+    <div class="card choice kid" onclick="startGame('rain')"><div class="big">🌧️</div><h3>Word Rain</h3><p class="muted">Type the falling words before they hit the ground!</p></div>
+    <div class="card choice kid" onclick="startGame('scramble')"><div class="big">🔀</div><h3>Word Scramble</h3><p class="muted">Unscramble the letters and type the secret word.</p></div>
+    <div class="card choice kid" onclick="startGame('balloon')"><div class="big">🎈</div><h3>Balloon Pop</h3><p class="muted">Press the letter on each balloon to pop it. Find the keys fast!</p></div>
+    <div class="card choice kid" onclick="startGame('race')"><div class="big">🏎️</div><h3>Race Car</h3><p class="muted">Type words to speed up your car and beat the blue car to the finish line!</p></div>
+    <div class="card choice kid" onclick="startGame('memory')"><div class="big">🧠</div><h3>Flash Memory</h3><p class="muted">A word flashes for a moment. Remember it, then type it!</p></div>
+    <div class="card choice kid" onclick="startGame('train')"><div class="big">🚂</div><h3>Sentence Train</h3><p class="muted">Type fun sentences to add a new car to your train.</p></div>
+  </div>
+</section>
+
+<!-- KID GAME -->
+<section class="screen kids" id="kid-play" hidden>
+  <div class="top"><button class="ghost" onclick="show('kid-menu')">← Games</button><h3 id="gname"></h3><span></span></div>
+  <div class="stats">
+    <div class="stat"><b id="gscore">0</b><span>score</span></div>
+    <div class="stat"><b id="ginfo">–</b><span id="ginfol"></span></div>
+  </div>
+  <div id="gbody"></div>
+</section>
+
+</div>
+
+<div class="over" id="over" hidden><div class="card">
+  <div style="font-size:56px" id="oemoji">🎉</div><h2 id="otitle"></h2><p id="otext" class="muted"></p>
+  <div class="row"><button id="oagain">Play again</button><button class="ghost" id="oback">Back</button></div>
+</div></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const rnd=n=>Math.floor(Math.random()*n);
+const pick=a=>a[rnd(a.length)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+let timer=null,raf=null,keyFn=null,back='home';
+
+function stopAll(){clearInterval(timer);clearInterval(raf);timer=raf=null;if(keyFn){document.removeEventListener('keydown',keyFn);keyFn=null}$('#over').hidden=true}
+function show(id){stopAll();document.querySelectorAll('.screen').forEach(s=>s.hidden=s.id!==id);window.scrollTo(0,0)}
+
+/* ===== PROFESSIONAL ===== */
+/* Grammar-based sentence builder: every sentence is built from meaningful, matching parts */
+const lc=s=>s[0].toLowerCase()+s.slice(1),cap=s=>s[0].toUpperCase()+s.slice(1),wc=s=>s.split(/\s+/).length;
+const P_SING=["The teacher","My sister","Our neighbor","The young farmer","A friendly doctor","The little boy","Her brother","The pilot","My grandmother","The baker"];
+const P_PLU=["The students","My friends","The children","Our neighbors","The workers","Those farmers","The players"];
+const ACT=[
+{b:"read",t:"reads",p:"read",g:"reading",o:["a good book","the morning newspaper","an interesting story"]},
+{b:"cook",t:"cooks",p:"cooked",g:"cooking",o:["a delicious dinner","fresh vegetables","a warm soup"]},
+{b:"paint",t:"paints",p:"painted",g:"painting",o:["a colorful picture","the old fence","a small boat"]},
+{b:"write",t:"writes",p:"wrote",g:"writing",o:["a long letter","a short poem","a useful report"]},
+{b:"build",t:"builds",p:"built",g:"building",o:["a wooden table","a strong bridge","a small house"]},
+{b:"clean",t:"cleans",p:"cleaned",g:"cleaning",o:["the whole kitchen","the dusty window","the quiet classroom"]},
+{b:"plant",t:"plants",p:"planted",g:"planting",o:["young trees","bright flowers","fresh seeds"]},
+{b:"visit",t:"visits",p:"visited",g:"visiting",o:["the city museum","an old friend","the public library"]},
+{b:"carry",t:"carries",p:"carried",g:"carrying",o:["a heavy bag","the fresh bread","a large box"]},
+{b:"repair",t:"repairs",p:"repaired",g:"repairing",o:["a broken chair","the old clock","a flat tire"]}];
+const ANI=[["dog",["barks loudly at strangers","sleeps near the warm fire","runs across the open field"]],["cat",["sleeps on the soft sofa","watches the small birds","climbs the tall tree"]],["bird",["sings a sweet song","builds a nest in the tree","flies over the blue lake"]],["horse",["gallops across the green field","eats fresh grass","drinks from the cool stream"]],["rabbit",["hops through the garden","nibbles a juicy carrot","hides under the bush"]]];
+const ADJ=["brown","small","happy","clever","gentle","young"],ADV=["carefully","quickly","quietly","happily","slowly","patiently"];
+const TPRES=["every morning","after lunch","on Sundays","in the evening","every day"],TPAST=["yesterday","last week","last night","two days ago"],TFUT=["tomorrow","next week","this weekend"];
+const PLACE=["in the garden","at the market","near the river","at school","in the town square","at home"];
+const NOUNS=["teacher","baker","pilot","doctor","farmer"],REL=["sister","brother","friend","neighbor"];
+const SHORT=["Practice makes perfect.","Reading is fun.","The sun is bright.","Birds can fly.","Time flies quickly.","Water is clear.","Smile and relax.","Learning never stops."];
+const FIXED=["The quick brown fox jumped over the lazy dog.","A gentle breeze moved through the tall green trees.","The bright moon lit the quiet village last night.","Good friends always share their time, their ideas, and their smiles.","If you practice every day, your typing will improve.","The train arrived at the station just before sunset.","Clean code is easy to read, easy to test, and easy to change.","She opened the window and heard the birds singing outside.","Hard work and patience can turn small steps into great success.","Our team finished the project early, so everyone went home happy."];
+const EXCL=["What a beautiful day!","Well done, my friend!","How wonderful this is!","Good luck and have fun!","Never give up on your dreams!","Please be careful on the road!"];
+const FILL=["","Great.","Well done.","Keep typing well."];
+const sub=()=>{const sing=Math.random()<.6;return{s:pick(sing?P_SING:P_PLU),sing}};
+const vb=(a,x)=>x.sing?a.t:a.b,ob=a=>pick(a.o),act=()=>pick(ACT);
+const T={
+ pres(){const x=sub(),a=act();return `${x.s} ${vb(a,x)} ${ob(a)}.`},
+ presT(){const x=sub(),a=act();return `${x.s} ${vb(a,x)} ${ob(a)} ${pick(TPRES)}.`},
+ adv(){const x=sub(),a=act();return `${x.s} ${vb(a,x)} ${ob(a)} ${pick(ADV)}.`},
+ place(){const x=sub(),a=act();return `${x.s} ${vb(a,x)} ${ob(a)} ${pick(PLACE)}.`},
+ animal(){const[n,ps]=pick(ANI);return `The ${pick(ADJ)} ${n} ${pick(ps)}.`},
+ short(){return pick(SHORT)},
+ fixed(){return pick(FIXED)},
+ excl(){return pick(EXCL)},
+ past(){const x=sub(),a=act();return `${x.s} ${a.p} ${ob(a)} ${pick(TPAST)}.`},
+ fut(){const x=sub(),a=act();return `${x.s} will ${a.b} ${ob(a)} ${pick(TFUT)}.`},
+ qPast(){const x=sub(),a=act();return `Did ${lc(x.s)} ${a.b} ${ob(a)} ${pick(TPAST)}?`},
+ qPres(){const x=sub(),a=act();return `${x.sing?"Does":"Do"} ${lc(x.s)} ${a.b} ${ob(a)} ${pick(TPRES)}?`},
+ qFut(){const x=sub(),a=act();return `Will ${lc(x.s)} ${a.b} ${ob(a)} ${pick(TFUT)}?`},
+ qWh(){const x=sub(),a=act();return `${pick(["Where","Why","When"])} did ${lc(x.s)} ${a.b} ${ob(a)}?`},
+ poss(){const a=act();return `The ${pick(NOUNS)}'s ${pick(REL)} ${a.t} ${ob(a)}.`},
+ comp(){const x=sub(),y=sub(),a=act(),b=act();return `${x.s} ${vb(a,x)} ${ob(a)}, and ${lc(y.s)} ${vb(b,y)} ${ob(b)}.`},
+ compBut(){const x=sub(),y=sub(),a=act(),b=act();return `${x.s} ${vb(a,x)} ${ob(a)}, but ${lc(y.s)} ${vb(b,y)} ${ob(b)}.`},
+ after(){const x=sub(),y=sub(),a=act(),b=act();return `After ${lc(x.s)} ${a.p} ${ob(a)}, ${lc(y.s)} ${b.p} ${ob(b)}.`},
+ whl(){const x=sub(),y=sub(),a=act(),b=act();return `While ${lc(x.s)} ${x.sing?"was":"were"} ${a.g} ${ob(a)}, ${lc(y.s)} ${y.sing?"was":"were"} ${b.g} ${ob(b)}.`},
+ cond(){const x=sub(),a=act();return `If the weather is nice ${pick(TFUT)}, ${lc(x.s)} will ${a.b} ${ob(a)} outside.`},
+ although(){const x=sub(),a=act();return `Although it was raining, ${lc(x.s)} ${a.p} ${ob(a)} ${pick(PLACE)}.`}
+};
+const LV={
+ rookie:["pres","pres","adv","animal","short","place","short"],
+ inter:["presT","past","fut","qPast","qPres","comp","compBut","poss","animal","place","fixed","excl","short"],
+ expert:["after","whl","cond","although","comp","compBut","qWh","qFut","poss","fixed","fixed","excl","past","fut","qPast"]
+};
+function makeText(n,level){
+  const out=[];let rem=n;
+  while(rem>0){
+    let s=null;
+    for(let i=0;i<60&&!s;i++){
+      const c=cap(T[pick(LV[level])]());
+      if(wc(c)<=rem&&!out.includes(c))s=c;
+    }
+    if(!s)s=FILL[Math.min(rem,3)];
+    out.push(s);rem-=wc(s);
+  }
+  return out.join(" ");
+}
+const MODES={rookie:{name:"🌱 Rookie",time:120,words:30},inter:{name:"🚀 Intermediate",time:120,words:70},expert:{name:"🔥 Expert",time:120,words:100}};
+let P=null;
+function startPro(m){
+  const c=MODES[m];
+  const text=makeText(c.words,m);
+  P={m,c,text,started:false,t0:0,keys:0,miss:0,done:false};
+  $('#pmode').textContent=c.name+" · "+c.words+" words";
+  $('#para').innerHTML=[...text].map(ch=>"<span>"+ch+"</span>").join("");
+  const inp=$('#pin');inp.value="";inp.maxLength=text.length;inp.disabled=false;
+  $('#ptime').textContent=c.time;$('#pwpm').textContent=0;$('#pacc').textContent="100%";$('#pprog').textContent="0%";$('#pbar').style.width="100%";
+  show('pro-play');paint("");inp.focus();
+}
+function paint(v){
+  const sp=$('#para').children;
+  for(let i=0;i<sp.length;i++){
+    sp[i].className=i<v.length?(v[i]===P.text[i]?"ok":"err"):(i===v.length?"cur":"");
+  }
+}
+function stats(){
+  const v=$('#pin').value;let ok=0;
+  for(let i=0;i<v.length;i++)if(v[i]===P.text[i])ok++;
+  const mins=Math.max((Date.now()-P.t0)/60000,1/600);
+  return{ok,wpm:Math.round(ok/5/mins),acc:P.keys?Math.max(0,Math.round(100*(P.keys-P.miss)/P.keys)):100,len:v.length};
+}
+$('#pin').addEventListener('input',e=>{
+  if(!P||P.done)return;
+  const v=e.target.value;
+  if(!P.started){P.started=true;P.t0=Date.now();timer=setInterval(tick,200)}
+  if(e.inputType&&e.inputType.startsWith("insert")){P.keys++;if(v.length&&v[v.length-1]!==P.text[v.length-1])P.miss++}
+  paint(v);
+  $('#pprog').textContent=Math.round(100*v.length/P.text.length)+"%";
+  if(v.length>=P.text.length)finishPro();
+});
+function tick(){
+  const left=Math.max(0,P.c.time-(Date.now()-P.t0)/1000);
+  const s=stats();
+  $('#ptime').textContent=Math.ceil(left);$('#pbar').style.width=(100*left/P.c.time)+"%";
+  $('#pwpm').textContent=s.wpm;$('#pacc').textContent=s.acc+"%";
+  if(left<=0)finishPro();
+}
+function finishPro(){
+  if(P.done)return;P.done=true;clearInterval(timer);
+  const s=stats(),el=Math.min((Date.now()-P.t0)/1000,P.c.time);
+  $('#pin').disabled=true;
+  const done=s.len>=P.text.length;
+  const msg=s.wpm>=70?"Outstanding speed! 🏆":s.wpm>=45?"Great work! Keep it up. 👏":s.wpm>=25?"Solid progress — accuracy first, speed follows. 💪":"Good start! Practice a little every day. 🌱";
+  showOver(done?"✅":"⏰",done?"Finished!":"Time’s up!",
+    `${s.wpm} WPM · ${s.acc}% accuracy\n${s.len} of ${P.text.length} characters in ${el.toFixed(1)}s.\n${msg}`,
+    ()=>startPro(P.m),()=>show('pro-menu'));
+}
+
+/* ===== OVERLAY ===== */
+function showOver(emoji,title,text,again,backFn){
+  $('#oemoji').textContent=emoji;$('#otitle').textContent=title;
+  $('#otext').style.whiteSpace="pre-line";$('#otext').textContent=text;
+  $('#oagain').onclick=()=>{$('#over').hidden=true;again()};
+  $('#oback').onclick=backFn;
+  $('#over').hidden=false;
+}
+
+/* ===== KIDS ===== */
+const KW=[["cat","🐱"],["dog","🐶"],["sun","☀️"],["fish","🐟"],["bird","🐦"],["tree","🌳"],["star","⭐"],["moon","🌙"],["book","📘"],["apple","🍎"],["house","🏠"],["car","🚗"],["ball","⚽"],["milk","🥛"],["cake","🎂"],["frog","🐸"],["duck","🦆"],["bear","🐻"],["rain","🌧️"],["boat","⛵"],["lion","🦁"],["pizza","🍕"],["train","🚂"],["flower","🌸"],["horse","🐴"]];
+function setScore(v){$('#gscore').textContent=v}
+function setInfo(v,l){$('#ginfo').textContent=v;$('#ginfol').textContent=l}
+function startGame(g){
+  show('kid-play');setScore(0);
+  ({rain:gameRain,scramble:gameScramble,balloon:gameBalloon,race:gameRace,memory:gameMemory,train:gameTrain})[g]();
+}
+function endGame(g,score,extra){
+  stopAll();
+  showOver(score>0?"🎉":"💪","Game over!",`Score: ${score}\n${extra||""}\nGreat job practicing!`,()=>startGame(g),()=>show('kid-menu'));
+}
+
+/* Game 1: Word Rain */
+function gameRain(){
+  $('#gname').textContent="🌧️ Word Rain";
+  $('#gbody').innerHTML='<div class="arena" id="arena"></div><input type="text" id="gin" placeholder="Type the word you see…" autocomplete="off" autocapitalize="off" spellcheck="false">';
+  const arena=$('#arena'),inp=$('#gin');inp.focus();
+  let words=[],score=0,lives=5,tickN=0,speed=0.5,popped=0;
+  setInfo("❤️❤️❤️❤️❤️","lives");
+  const pool=KW.map(k=>k[0]).concat("jump play happy green smile cloud water candy mouse tiger".split(" "));
+  function spawn(){
+    const t=pick(pool),el=document.createElement("div");
+    el.className="fw";el.textContent=t;
+    const x=15+rnd(70);el.style.left=x+"%";el.style.top="0%";arena.appendChild(el);
+    words.push({t,el,y:0});
+  }
+  inp.addEventListener("input",()=>{
+    const v=inp.value.trim().toLowerCase();
+    words.forEach(w=>w.el.classList.toggle("hit",v&&w.t.startsWith(v)));
+    const i=words.findIndex(w=>w.t===v);
+    if(i>-1){
+      words[i].el.remove();words.splice(i,1);inp.value="";
+      score+=10;popped++;setScore(score);
+      if(popped%5===0)speed+=0.12;
+    }
+  });
+  raf=setInterval(()=>{
+    tickN++;
+    if(tickN%Math.max(16,45-popped)===1)spawn();
+    for(let i=words.length-1;i>=0;i--){
+      const w=words[i];w.y+=speed;w.el.style.top=Math.min(w.y,92)+"%";
+      if(w.y>=92){w.el.remove();words.splice(i,1);lives--;setInfo("❤️".repeat(Math.max(lives,0))||"💔","lives");
+        if(lives<=0){endGame('rain',score,`You popped ${popped} words.`);return}}
+    }
+  },50);
+}
+
+/* Game 2: Word Scramble */
+function gameScramble(){
+  $('#gname').textContent="🔀 Word Scramble";
+  const rounds=shuffle(KW).slice(0,8);let r=0,score=0,t0=0;
+  $('#gbody').innerHTML='<div class="card center"><div class="emoji" id="sem"></div><div class="scr" id="ssc"></div><p class="muted">Type the correct word (hint: look at the picture!)</p><input type="text" id="gin" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Your answer…"><p><button class="ghost" id="skip">Skip ⏭</button></p></div>';
+  const inp=$('#gin');
+  function scr(w){let s;do{s=shuffle(w.split("")).join("")}while(s===w);return s}
+  function next(){
+    if(r>=rounds.length){endGame('scramble',score,`You solved ${rounds.length} words!`);return}
+    const [w,e]=rounds[r];
+    $('#sem').textContent=e;$('#ssc').textContent=scr(w).toUpperCase();
+    setInfo((r+1)+" / "+rounds.length,"word");inp.value="";inp.focus();t0=Date.now();
+  }
+  inp.addEventListener("input",()=>{
+    if(inp.value.trim().toLowerCase()===rounds[r][0]){
+      const sec=(Date.now()-t0)/1000;
+      score+=10+Math.max(0,Math.round(10-sec));setScore(score);r++;next();
+    }
+  });
+  $('#skip').onclick=()=>{r++;next()};
+  next();
+}
+
+/* Game 3: Balloon Pop */
+function gameBalloon(){
+  $('#gname').textContent="🎈 Balloon Pop";
+  $('#gbody').innerHTML='<div class="arena" id="arena"></div><p class="center muted">Press the letter shown on a balloon on your keyboard!</p>';
+  const arena=$('#arena'),cols=["#e03131","#1c7ed6","#2f9e44","#f08c00","#ae3ec9","#0c8599"];
+  let bs=[],score=0,left=45,tickN=0,pops=0,miss=0;
+  setInfo(left+"s","time left");
+  keyFn=e=>{
+    if(e.key.length!==1||!/[a-z]/i.test(e.key))return;
+    const k=e.key.toUpperCase();
+    const c=bs.filter(b=>b.l===k).sort((a,b)=>a.y-b.y)[0];
+    if(c){bs.splice(bs.indexOf(c),1);c.el.classList.add("pop");setTimeout(()=>c.el.remove(),200);score+=10;pops++;setScore(score)}
+    else{score=Math.max(0,score-2);miss++;setScore(score)}
+  };
+  document.addEventListener("keydown",keyFn);
+  raf=setInterval(()=>{
+    tickN++;
+    if(tickN%14===1){
+      const el=document.createElement("div"),l=String.fromCharCode(65+rnd(26));
+      el.className="balloon";el.textContent=l;el.style.background=pick(cols);
+      el.style.left=(10+rnd(80))+"%";el.style.top="100%";arena.appendChild(el);bs.push({l,el,y:100});
+    }
+    for(let i=bs.length-1;i>=0;i--){
+      const b=bs[i];b.y-=0.9+pops*0.012;b.el.style.top=b.y+"%";
+      if(b.y<-20){b.el.remove();bs.splice(i,1)}
+    }
+    if(tickN%20===0){left--;setInfo(left+"s","time left");if(left<=0)endGame('balloon',score,`Popped ${pops} balloons, ${miss} wrong keys.`)}
+  },50);
+}
+/* Game 4: Race Car */
+function gameRace(){
+  $('#gname').textContent="🏎️ Race Car";
+  $('#gbody').innerHTML='<div class="card"><div class="lane"><span class="car" id="c1">🏎️</span><span class="flag">🏁</span></div><div class="lane"><span class="car" id="c2">🚙</span><span class="flag">🏁</span></div><div class="scr" id="rw"></div><input type="text" id="gin" placeholder="Type the word to drive!" autocomplete="off" autocapitalize="off" spellcheck="false"></div>';
+  const WL=KW.map(k=>k[0]).concat("rainbow jungle monkey rocket sunshine puppy bubble".split(" "));
+  let me=0,cpu=0,n=0,score=0,w;const inp=$('#gin');
+  const move=()=>{$('#c1').style.left=me+"%";$('#c2').style.left=cpu+"%"};
+  const next=()=>{w=pick(WL);$('#rw').textContent=w};
+  setInfo("0 / 10","words");
+  inp.addEventListener("input",()=>{
+    if(inp.value.trim().toLowerCase()!==w)return;
+    inp.value="";n++;score+=10;me=Math.min(88,me+8.8);setScore(score);setInfo(n+" / 10","words");move();
+    if(n>=10)endGame('race',score+50,"You won the race! 🏆 (+50 bonus)");else next();
+  });
+  raf=setInterval(()=>{cpu+=0.27;move();if(cpu>=88)endGame('race',score,"The blue car won this time. Try again!")},100);
+  next();inp.focus();
+}
+
+/* Game 5: Flash Memory */
+const MEM=[["sun","cat","dog","hat","bus"],["apple","tiger","pizza","cloud","happy"],["rainbow","monkey","dinosaur","pancake","umbrella"]];
+function gameMemory(){
+  $('#gname').textContent="🧠 Flash Memory";
+  $('#gbody').innerHTML='<div class="card center"><p class="muted" id="mh"></p><div class="scr" id="mw"></div><input type="text" id="gin" disabled placeholder="Type the word you remember…" autocomplete="off" autocapitalize="off" spellcheck="false"><p class="muted">Press Enter to check a wrong answer</p></div>';
+  let r=0,ok=0,score=0,lives=3,tg="";const inp=$('#gin');
+  function round(){
+    if(r>=9||lives<=0){endGame('memory',score,`You remembered ${ok} of ${r} words.`);return}
+    tg=pick(MEM[Math.floor(r/3)]);inp.value="";inp.disabled=true;
+    $('#mw').textContent=tg;$('#mh').textContent="👀 Remember this word!";setInfo("❤️".repeat(lives),"chances");
+    timer=setTimeout(()=>{$('#mw').textContent="❓❓❓";$('#mh').textContent="⌨️ Now type it!";inp.disabled=false;inp.focus()},900+tg.length*250);
+  }
+  inp.addEventListener("input",()=>{
+    if(inp.value.trim().toLowerCase()===tg){ok++;score+=10+tg.length*2;setScore(score);r++;round()}
+  });
+  inp.addEventListener("keydown",e=>{
+    if(e.key==="Enter"&&!inp.disabled){lives--;inp.disabled=true;$('#mh').textContent="Oops! It was:";$('#mw').textContent=tg;r++;timer=setTimeout(round,1500)}
+  });
+  round();
+}
+
+/* Game 6: Sentence Train */
+const KS=["I like to play.","The sun is hot.","My dog can run fast.","We eat lunch at noon.","Birds sing in the morning.","I love reading books at night.","The little frog jumps into the pond.","My family goes to the beach in summer.","A big red bus stops near our school.","Every night I look at the bright stars."];
+function gameTrain(){
+  $('#gname').textContent="🚂 Sentence Train";
+  const L=shuffle(KS).slice(0,6).sort((a,b)=>a.length-b.length);
+  $('#gbody').innerHTML='<div class="card"><div class="train" id="tr">🚂</div><div class="para" id="ks"></div><input type="text" id="gin" placeholder="Type the sentence…" autocomplete="off" autocapitalize="off" spellcheck="false"></div>';
+  let i=0,score=0,keys=0,miss=0,t0=0,s="";const inp=$('#gin');
+  const pt=v=>[...$('#ks').children].forEach((el,j)=>el.className=j<v.length?(v[j]===s[j]?"ok":"err"):(j===v.length?"cur":""));
+  function nxt(){
+    s=L[i];$('#ks').innerHTML=[...s].map(c=>"<span>"+c+"</span>").join("");
+    inp.value="";inp.maxLength=s.length;inp.focus();pt("");setInfo((i+1)+" / "+L.length,"train cars");t0=Date.now();
+  }
+  inp.addEventListener("input",e=>{
+    const v=inp.value;
+    if(e.inputType&&e.inputType.startsWith("insert")){keys++;if(v[v.length-1]!==s[v.length-1])miss++}
+    pt(v);
+    if(v===s){
+      score+=20+Math.max(0,Math.round(15-(Date.now()-t0)/1000));setScore(score);i++;
+      $('#tr').textContent="🚂"+"🚃".repeat(i);
+      if(i>=L.length)endGame('train',score,`Accuracy: ${keys?Math.round(100*(keys-miss)/keys):100}%`);else nxt();
+    }
+  });
+  nxt();
+}
+</script>
+</body>
+</html>
